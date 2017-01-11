@@ -29,5 +29,12 @@ Improvements:
     8. Look at using Requests instead of urllib3.
     9. Write a short script to start it in Production, activating the environment and redirecting output (unless better logging implemented; see #1).
 
+Second commit fixes:
+    1. Fixed extraneous @ signs and parentheses
+    2. Added certificate verification (#5 above)
+    3. Separated REST endpoint from implementation (allows #6 to be tested until it's fixed)
+    4. Added tests
+
+
 
 
