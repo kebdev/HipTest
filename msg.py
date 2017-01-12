@@ -75,14 +75,39 @@ def get_links(chat_msg):
  
     return link_titles
 
+def run_test(msg):
+    # import libraries only needed for tests; so don't import it at the top
+    import json
+    # !!from bs4.dammit import EntitySubstitution
+    # !!esub = EntitySubstitution()
+
+    print 'Input: "{}"'.format(msg)
+    print "Return:"
+    mentions, emoticons, links = extract_content(msg)
+
+    # replacement for jsonify since that requires a Flask request context
+    for link in links:
+        escaped = re.sub(pattern='\"', repl='&quot;', string=link['title'])
+        link['title'] = escaped
+    output_map = {}
+    if mentions:
+        output_map['mentions'] = mentions
+    if emoticons:
+        output_map['emoticons'] = emoticons
+    if links:
+        output_map['links'] = links
+
+    # print unit test output
+    print json.dumps(output_map, indent=2, separators=(',', ': '))
+    print
+    return
+
 def run_tests():
-    import json     # only needed for tests, so don't import it at the top
-    print "test1: ", get_mentions('@chris you around?')
-    print "test2: ", get_emoticons('Good morning! (megusta) (coffee)')
-    print "test3: ", get_links('Olympics are starting soon; http://www.nbcolympics.com')
-    mentions, emoticons, links = extract_content('@bob @john (success) such a cool feature; https://twitter.com/jdorfman/status/430511497475670016')
-    print "test4: ", json.dumps([mentions, emoticons, links], indent=4, separators=(',', ': '))
-    pass
+    run_test('@chris you around?')
+    run_test('Good morning! (megusta) (coffee)')
+    run_test('Olympics are starting soon; http://www.nbcolympics.com')
+    run_test('@bob @john (success) such a cool feature; https://twitter.com/jdorfman/status/430511497475670016')
+    return
 
 if __name__ == '__main__':
     run_tests()

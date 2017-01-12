@@ -5,7 +5,7 @@ Installation:
     These instructions have been tested for a Mac. If you're running Windows, it should be similar but I haven't tested it.
 
     Create a conda environment and activate it:
-        conda create -n hiptest python=2.7 flask beautiful-soup urllib3
+        conda create -n hiptest python=2.7 flask beautiful-soup urllib3 pyOpenSSL cryptography idna certifi
         source activate hiptest
 
     Run the server. To run it locally, just use
@@ -15,25 +15,18 @@ Installation:
 
 Usage:
     By default, this runs on port 5000. an example URL is
-        http://localhost:5000/content/@kevin @monica (ladios)
+        http://localhost:5000/content/"@chris you around?"
 
 Improvements:
     1. Use better logging
-    2. Remove the @ signs from the mentions and remove the parentheses from the emoticons
-    3. If the URL is not found, it is just ignored. Discuss with the Product Owner what the correct behavior should be
-    4. The ordering in the exercise is mentions, emoticons, links; in my output, it's emoticons, links, mentions
+    2. If the URL is not found, it is just ignored. Discuss with the Product Owner what the correct behavior should be
+    3. The ordering in the exercise is: mentions, emoticons, links. In my output, it's: emoticons, links, mentions
          (alphabetical order). If this is a problem, fix it.
-    5. Fix this warning: "Unverified HTTPS request is being made. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#ssl-warnings"
-    6. Could not get links to work with a GET request. Change to POST. Hard-coded a couple links to verify that the page title was handled correctly.
-    7. Testing was all done manually using a browser. Write a cURL script to test automatically.
-    8. Look at using Requests instead of urllib3.
-    9. Write a short script to start it in Production, activating the environment and redirecting output (unless better logging implemented; see #1).
+    4. Could not get links to work with a GET request. Change to POST.
+    5. Unit testing is currently in msg.py. Once #6 is fixed, test using cURL scripts or the equivalent.
+    6. Look at using Requests instead of urllib3.
+    7. Write a short script to start it in Production, activating the environment and redirecting output (unless better logging implemented; see #1).
 
-Second commit fixes:
-    1. Fixed extraneous @ signs and parentheses
-    2. Added certificate verification (#5 above)
-    3. Separated REST endpoint from implementation (allows #6 to be tested until it's fixed)
-    4. Added tests
 
 
 
