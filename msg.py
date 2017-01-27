@@ -1,13 +1,33 @@
 
 from bs4 import BeautifulSoup
 import re
+
 import certifi
 import urllib3
 import urllib3.contrib.pyopenssl
-
 urllib3.contrib.pyopenssl.inject_into_urllib3()
 
+import os
+import logging
+import logging.handlers
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)  # must be set to lowest level of all handlers
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.ERROR)      # display error and critical on the console so they can be viewed in realtime
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
+logfile = os.getcwd() + os.sep + 'msg.log'
+fh = logging.handlers.TimedRotatingFileHandler(logfile, when='midnight', backupCount=7)
+fh.setLevel(logging.DEBUG)
+fh.setFormatter(formatter)
+logger.addHandler(fh)
+
 def extract_content(chat_msg):
+    logger.debug("Extracting content from: " + chat_msg)
     mentions = get_mentions(chat_msg)
     emoticons = get_emoticons(chat_msg)
     links = get_links(chat_msg)
@@ -16,11 +36,13 @@ def extract_content(chat_msg):
 def get_mentions(chat_msg):
     at_mentions = re.findall('@[a-zA-Z]{1,15}', chat_msg)
     mentions = [x[1:] for x in at_mentions]    # strip off leading '@' sign
+    logger.debug("mentions = " + str(mentions))
     return mentions
 
 def get_emoticons(chat_msg):
     paren_emoticons = re.findall('\([a-zA-Z]{1,15}\)', chat_msg)
     emoticons = [x[1:-1] for x in paren_emoticons]
+    logger.debug("emoticons = " + str(emoticons))
     return emoticons
 
 def get_links(chat_msg):
@@ -72,7 +94,9 @@ def get_links(chat_msg):
                 'title': soup.title.string
             }
             link_titles.append(link_title)
- 
+
+    logger.debug("link_titles = " + str(link_titles))
+
     return link_titles
 
 def run_test(msg):
