@@ -104,6 +104,7 @@ def get_links(chat_msg):
 def run_test(msg):
     # import libraries only needed for tests; so don't import it at the top
     import json
+    from collections import OrderedDict
     # !!from bs4.dammit import EntitySubstitution
     # !!esub = EntitySubstitution()
 
@@ -115,7 +116,7 @@ def run_test(msg):
     for link in links:
         escaped = re.sub(pattern='\"', repl='&quot;', string=link['title'])
         link['title'] = escaped
-    output_map = {}
+    output_map = OrderedDict()
     if mentions:
         output_map['mentions'] = mentions
     if emoticons:
