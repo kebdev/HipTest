@@ -1,19 +1,18 @@
-from flask import Flask, jsonify
-from bs4 import BeautifulSoup
-import re
-import urllib3
+from flask import Flask, jsonify, request
 
 from msg import extract_content
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def index():
     return '<h1>Hello Atlassian</h1>'
 
-@app.route('/content/<string:chat_msg>')
-def get_content(chat_msg):
-    mentions, emoticons, links = extract_content(chat_msg)
+
+@app.route('/api/msg', methods=['GET'])
+def get_content():
+    mentions, emoticons, links = extract_content(request.query_string)
     return jsonify(mentions=mentions, emoticons=emoticons, links=links)
 
 

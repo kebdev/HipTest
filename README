@@ -18,19 +18,16 @@ Usage:
         http://localhost:5000/content/"@chris you around?"
 
 Improvements:
-    1. Change the example URL to
-         http://localhost:5000/api/msg?'Olympics are starting soon; http://www.nbcolympics.com'
-            i.e. use query params
-    2. The ordering in the exercise is: mentions, emoticons, links. Verify this matches the jsonify output
-    3. Unit testing is currently in msg.py. Once #3 is fixed, test using cURL scripts or the equivalent.
-    4. Look at using Requests instead of urllib3.
-    5. Write a short script to start it in Production, activating the environment and redirecting output (unless better logging implemented; see #1).
-    6. Add a method for login
-    7. Add a capability for throttling users, to prevent DoS
-    8. Add a cache for URLs, since fetching them is expensive
+    1. Use Requests instead of urllib3.
+    2. Add a mechanism for health reporting, that returns usages for CPU, mem, HDD, network
+    3. Add a cache for URLs, since fetching them is expensive
+    4. The ordering in the exercise is: mentions, emoticons, links. Verify this matches the jsonify output
+    5. Unit testing is currently in msg.py. Add tests using cURL scripts or the equivalent.
+    6. Write a short script to start it in Production, activating the environment and redirecting output (unless better logging implemented; see #1).
+    7. Add a method for login
+    8. Add a capability for throttling users, to prevent DoS
     9. Think about how to prevent a user from entering a malicious URL
     10. Send gzipped json back instead of cleartext json
-    11. Add a mechanism for health reporting, that returns usages for CPU, mem, HDD, network
 
 
 
