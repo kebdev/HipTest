@@ -2,10 +2,7 @@
 from bs4 import BeautifulSoup
 import re
 
-import certifi
-import urllib3
-import urllib3.contrib.pyopenssl
-urllib3.contrib.pyopenssl.inject_into_urllib3()
+import requests
 
 import os
 import logging
@@ -25,6 +22,40 @@ fh = logging.handlers.TimedRotatingFileHandler(logfile, when='midnight', backupC
 fh.setLevel(logging.DEBUG)
 fh.setFormatter(formatter)
 logger.addHandler(fh)
+
+URL_REGEX = re.compile(
+    # protocol identifier
+    u"(?:(?:https?|ftp)://)"
+    # user:pass authentication
+    u"(?:\S+(?::\S*)?@)?"
+    u"(?:"
+    # IP address exclusion
+    # private & local networks
+    u"(?!(?:10|127)(?:\.\d{1,3}){3})"
+    u"(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})"
+    u"(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})"
+    # IP address dotted notation octets
+    # excludes loopback network 0.0.0.0
+    # excludes reserved space >= 224.0.0.0
+    # excludes network & broadcast addresses
+    # (first & last IP address of each class)
+    u"(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])"
+    u"(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}"
+    u"(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))"
+    u"|"
+    # host name
+    u"(?:(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)"
+    # domain name
+    u"(?:\.(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)*"
+    # TLD identifier
+    u"(?:\.(?:[a-z\u00a1-\uffff]{2,}))"
+    u")"
+    # port number
+    u"(?::\d{2,5})?"
+    # resource path
+    u"(?:/\S*)?"
+    , re.UNICODE)
+
 
 def extract_content(chat_msg):
     logger.debug("Extracting content from: " + chat_msg)
@@ -46,56 +77,26 @@ def get_emoticons(chat_msg):
     return emoticons
 
 def get_links(chat_msg):
-
-    URL_REGEX = re.compile(
-        # protocol identifier
-        u"(?:(?:https?|ftp)://)"
-        # user:pass authentication
-        u"(?:\S+(?::\S*)?@)?"
-        u"(?:"
-        # IP address exclusion
-        # private & local networks
-        u"(?!(?:10|127)(?:\.\d{1,3}){3})"
-        u"(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})"
-        u"(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})"
-        # IP address dotted notation octets
-        # excludes loopback network 0.0.0.0
-        # excludes reserved space >= 224.0.0.0
-        # excludes network & broadcast addresses
-        # (first & last IP address of each class)
-        u"(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])"
-        u"(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}"
-        u"(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))"
-        u"|"
-        # host name
-        u"(?:(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)"
-        # domain name
-        u"(?:\.(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)*"
-        # TLD identifier
-        u"(?:\.(?:[a-z\u00a1-\uffff]{2,}))"
-        u")"
-        # port number
-        u"(?::\d{2,5})?"
-        # resource path
-        u"(?:/\S*)?"
-        , re.UNICODE)
-
     links = URL_REGEX.findall(chat_msg)
+    logger.debug("links = " + str(links))
 
-    http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
-    
     link_titles = []
     for link in links:
-        r = http.request('GET', link)
-        if r.status == 200 or r.status == 201:
-            soup = BeautifulSoup(r.data)
+        r = requests.get(link)
+        if 200 <= r.status_code < 300:
+            soup = BeautifulSoup(r.text)
+            # any other entity substitutions?
+            if soup.title:
+                title = re.sub(pattern='\"', repl='&quot;', string=soup.title.string)
+            else:
+                title = "Not Found"
             link_title = {
                 'url': link,
-                'title': soup.title.string if soup.title else "Not Found"
+                'title': title
             }
             link_titles.append(link_title)
         else:
-            logger.info("Link {0} returned status {1}".format(link, r.status))
+            logger.info("Link {0} returned status {1}".format(link, r.status_code))
 
     logger.debug("link_titles = " + str(link_titles))
 
@@ -105,17 +106,12 @@ def run_test(msg):
     # import libraries only needed for tests; so don't import it at the top
     import json
     from collections import OrderedDict
-    # !!from bs4.dammit import EntitySubstitution
-    # !!esub = EntitySubstitution()
 
     print 'Input: "{}"'.format(msg)
     print "Return:"
     mentions, emoticons, links = extract_content(msg)
 
     # replacement for jsonify since that requires a Flask request context
-    for link in links:
-        escaped = re.sub(pattern='\"', repl='&quot;', string=link['title'])
-        link['title'] = escaped
     output_map = OrderedDict()
     if mentions:
         output_map['mentions'] = mentions

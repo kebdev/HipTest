@@ -5,7 +5,7 @@ Installation:
     These instructions have been tested for a Mac. If you're running Windows, it should be similar but I haven't tested it.
 
     Create a conda environment and activate it:
-        conda create -n hiptest python=2.7 flask beautiful-soup urllib3 pyOpenSSL cryptography idna certifi
+        conda create -n hiptest python=2.7 flask beautiful-soup requests
         source activate hiptest
 
     Run the server. To run it locally, just use
@@ -15,10 +15,9 @@ Installation:
 
 Usage:
     By default, this runs on port 5000. an example URL is
-        http://localhost:5000/content/"@chris you around?"
+        http://localhost:5000/api/msg?@chris you around?
 
 Improvements:
-    1. Use Requests instead of urllib3.
     2. Add a mechanism for health reporting, that returns usages for CPU, mem, HDD, network
     3. Add a cache for URLs, since fetching them is expensive
     4. The ordering in the exercise is: mentions, emoticons, links. Verify this matches the jsonify output
