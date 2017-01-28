@@ -89,11 +89,13 @@ def get_links(chat_msg):
         r = http.request('GET', link)
         if r.status == 200 or r.status == 201:
             soup = BeautifulSoup(r.data)
-            link_title = { 
-                'url': link, 
-                'title': soup.title.string
+            link_title = {
+                'url': link,
+                'title': soup.title.string if soup.title else "Not Found"
             }
             link_titles.append(link_title)
+        else:
+            logger.info("Link {0} returned status {1}".format(link, r.status))
 
     logger.debug("link_titles = " + str(link_titles))
 

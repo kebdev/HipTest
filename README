@@ -18,15 +18,20 @@ Usage:
         http://localhost:5000/content/"@chris you around?"
 
 Improvements:
-    1. Use better logging
-    2. If the URL is not found, it is just ignored. Discuss with the Product Owner what the correct behavior should be
-    3. The ordering in the exercise is: mentions, emoticons, links. In my output, it's: emoticons, links, mentions
+    2. The ordering in the exercise is: mentions, emoticons, links. In my output, it's: emoticons, links, mentions
          (alphabetical order). If this is a problem, fix it.
-    4. Could not get links to work with a GET request. Change to POST.
-    5. Unit testing is currently in msg.py. Once #6 is fixed, test using cURL scripts or the equivalent.
-    6. Look at using Requests instead of urllib3.
-    7. Write a short script to start it in Production, activating the environment and redirecting output (unless better logging implemented; see #1).
-
+    3. Change the example URL to
+         http://localhost:5000/api/msg?'Olympics are starting soon; http://www.nbcolympics.com'
+            i.e. use query params
+    4. Unit testing is currently in msg.py. Once #3 is fixed, test using cURL scripts or the equivalent.
+    5. Look at using Requests instead of urllib3.
+    6. Write a short script to start it in Production, activating the environment and redirecting output (unless better logging implemented; see #1).
+    7. Add a method for login
+    8. Add a capability for throttling users, to prevent DoS
+    9. Add a cache for URLs, since fetching them is expensive
+    10. Think about how to prevent a user from entering a malicious URL
+    11. Send gzipped json back instead of cleartext json
+    12. Add a mechanism for health reporting, that returns usages for CPU, mem, HDD, network
 
 
 
