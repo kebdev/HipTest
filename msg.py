@@ -5,6 +5,9 @@ import re
 import requests
 import psutil
 
+from repoze.lru import LRUCache
+cache = LRUCache(100)
+
 import os
 import logging
 import logging.handlers
@@ -83,21 +86,31 @@ def get_links(chat_msg):
 
     link_titles = []
     for link in links:
-        r = requests.get(link)
-        if 200 <= r.status_code < 300:
-            soup = BeautifulSoup(r.text)
-            # any other entity substitutions?
-            if soup.title:
-                title = re.sub(pattern='\"', repl='&quot;', string=soup.title.string)
+        title = cache.get(link)
+        if title is None:
+            logger.info("Retrieving url {0} from site".format(link))
+            # use virustotal to determine if malicious or not before calling GET
+            r = requests.get(link)
+            if 200 <= r.status_code < 300:
+                soup = BeautifulSoup(r.text)
+                # any other entity substitutions?
+                if soup.title:
+                    title = re.sub(pattern='\"', repl='&quot;', string=soup.title.string)
+                else:
+                    title = "Not Found"
+
+                cache.put(link, title)
             else:
-                title = "Not Found"
-            link_title = {
-                'url': link,
-                'title': title
-            }
-            link_titles.append(link_title)
+                logger.info("Link {0} returned status {1}".format(link, r.status_code))
+                title = "Not Available"
         else:
-            logger.info("Link {0} returned status {1}".format(link, r.status_code))
+            logger.info("Retrieving url {0} from cache".format(link))
+
+        link_title = {
+            'url': link,
+            'title': title
+        }
+        link_titles.append(link_title)
 
     logger.debug("link_titles = " + str(link_titles))
 
@@ -141,6 +154,7 @@ def run_tests():
     run_test('Good morning! (megusta) (coffee)')
     run_test('Olympics are starting soon; http://www.nbcolympics.com')
     run_test('@bob @john (success) such a cool feature; https://twitter.com/jdorfman/status/430511497475670016')
+    run_test('Hello https://www.google.com and https://www.google.com')  # test caching
     return
 
 if __name__ == '__main__':

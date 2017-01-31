@@ -5,7 +5,7 @@ Installation:
     These instructions have been tested for a Mac. If you're running Windows, it should be similar but I haven't tested it.
 
     Create a conda environment and activate it:
-        conda create -n hiptest python=2.7 flask beautiful-soup requests psutil
+        conda create -n hiptest python=2.7 flask beautiful-soup requests psutil repoze.lru
         source activate hiptest
 
     Run the server. To run it locally, just use
@@ -18,14 +18,14 @@ Usage:
         http://localhost:5000/api/msg?@chris you around?
 
 Improvements:
-    3. Add a cache for URLs, since fetching them is expensive
-    4. The ordering in the exercise is: mentions, emoticons, links. Verify this matches the jsonify output
-    5. Unit testing is currently in msg.py. Add tests using cURL scripts or the equivalent.
-    6. Write a short script to start it in Production, activating the environment and redirecting output (unless better logging implemented; see #1).
-    7. Add a method for login
-    8. Add a capability for throttling users, to prevent DoS
-    9. Think about how to prevent a user from entering a malicious URL
-    10. Send gzipped json back instead of cleartext json
+    1. The ordering in the exercise is: mentions, emoticons, links. Verify this matches the jsonify output
+    2. Unit testing is currently in msg.py. Add tests using cURL scripts or the equivalent.
+    3. Write a short script to start it in Production, activating the environment and redirecting output (unless better logging implemented; see #1).
+    4. Add a method for login
+    5. Add a capability for throttling users, to prevent DoS
+    6. Think about how to prevent a user from entering a malicious URL
+    7. Send gzipped json back instead of cleartext json
+    8. Use virustotal to determine if malicious or not before calling GET
 
 
 
