@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import re
 
 import requests
+import psutil
 
 import os
 import logging
@@ -101,6 +102,16 @@ def get_links(chat_msg):
     logger.debug("link_titles = " + str(link_titles))
 
     return link_titles
+
+
+def get_load():
+    cpu = psutil.cpu_percent()
+    hdd = psutil.disk_usage('/')
+    network = psutil.net_if_stats()
+    virtmem = psutil.virtual_memory()
+
+    return cpu, hdd, network, virtmem
+
 
 def run_test(msg):
     # import libraries only needed for tests; so don't import it at the top

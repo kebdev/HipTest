@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 
-from msg import extract_content
+from msg import extract_content, get_load
 
 app = Flask(__name__)
 
@@ -8,6 +8,12 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     return '<h1>Hello Atlassian</h1>'
+
+
+@app.route('/health')
+def health():
+    cpu, hdd, network, virtmem = get_load()
+    return jsonify(cpu=cpu, hdd=hdd, network=network, virtmem=virtmem)
 
 
 @app.route('/api/msg', methods=['GET'])
