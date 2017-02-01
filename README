@@ -18,14 +18,14 @@ Usage:
         http://localhost:5000/api/msg?@chris you around?
 
 Improvements:
-    1. The ordering in the exercise is: mentions, emoticons, links. Verify this matches the jsonify output
-    2. Unit testing is currently in msg.py. Add tests using cURL scripts or the equivalent.
-    3. Write a short script to start it in Production, activating the environment and redirecting output (unless better logging implemented; see #1).
+    1. Create py.test unit tests from existing tests in msg.py
+    2. Add tests using cURL scripts or the equivalent for integration testing.
+    3. Create a concept of a user
     4. Add a method for login
     5. Add a capability for throttling users, to prevent DoS
-    6. Think about how to prevent a user from entering a malicious URL
-    7. Send gzipped json back instead of cleartext json
-    8. Use virustotal to determine if malicious or not before calling GET
+    6. Use virustotal to determine if malicious or not before calling GET
+    7. Write a short script to start it in Production, activating the environment and redirecting output.
+
 
 
 
