@@ -5,7 +5,7 @@ Installation:
     These instructions have been tested for a Mac. If you're running Windows, it should be similar but I haven't tested it.
 
     Create a conda environment and activate it:
-        conda create -n hiptest python=2.7 flask beautiful-soup requests psutil repoze.lru
+        conda create -n hiptest python=2.7 flask beautiful-soup requests psutil repoze.lru pytest
         source activate hiptest
 
     Run the server. To run it locally, just use
@@ -18,7 +18,6 @@ Usage:
         http://localhost:5000/api/msg?@chris you around?
 
 Improvements:
-    1. Create py.test unit tests from existing tests in msg.py
     2. Add tests using cURL scripts or the equivalent for integration testing.
     3. Create a concept of a user
     4. Add a method for login
