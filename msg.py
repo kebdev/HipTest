@@ -1,6 +1,8 @@
 
 from bs4 import BeautifulSoup
 import re
+import json
+from collections import OrderedDict
 
 import requests
 import psutil
@@ -66,7 +68,20 @@ def extract_content(chat_msg):
     mentions = get_mentions(chat_msg)
     emoticons = get_emoticons(chat_msg)
     links = get_links(chat_msg)
-    return mentions, emoticons, links
+
+    output_map = OrderedDict()
+    if mentions:
+        output_map['mentions'] = mentions
+    if emoticons:
+        output_map['emoticons'] = emoticons
+    if links:
+        output_map['links'] = links
+
+    result = json.dumps(output_map, indent=2, separators=(',', ': '))
+    logger.debug("Extracted content: " + result)
+
+    return result
+
 
 def get_mentions(chat_msg):
     at_mentions = re.findall('@[a-zA-Z]{1,15}', chat_msg)
@@ -74,11 +89,13 @@ def get_mentions(chat_msg):
     logger.debug("mentions = " + str(mentions))
     return mentions
 
+
 def get_emoticons(chat_msg):
     paren_emoticons = re.findall('\([a-zA-Z]{1,15}\)', chat_msg)
     emoticons = [x[1:-1] for x in paren_emoticons]
     logger.debug("emoticons = " + str(emoticons))
     return emoticons
+
 
 def get_links(chat_msg):
     links = URL_REGEX.findall(chat_msg)
@@ -118,36 +135,24 @@ def get_links(chat_msg):
 
 
 def get_load():
-    cpu = psutil.cpu_percent()
-    hdd = psutil.disk_usage('/')
-    network = psutil.net_if_stats()
-    virtmem = psutil.virtual_memory()
+    load_stats = {
+        'cpu': psutil.cpu_percent(),
+        'hdd': psutil.disk_usage('/'),
+        'network': psutil.net_if_stats(),
+        'virtmem': psutil.virtual_memory()
+    }
+    result = json.dumps(load_stats, indent=2, separators=(',', ': '))
+    logger.debug("Load stats: " + result)
 
-    return cpu, hdd, network, virtmem
+    return result
 
 
 def run_test(msg):
-    # import libraries only needed for tests; so don't import it at the top
-    import json
-    from collections import OrderedDict
-
-    print 'Input: "{}"'.format(msg)
-    print "Return:"
-    mentions, emoticons, links = extract_content(msg)
-
-    # replacement for jsonify since that requires a Flask request context
-    output_map = OrderedDict()
-    if mentions:
-        output_map['mentions'] = mentions
-    if emoticons:
-        output_map['emoticons'] = emoticons
-    if links:
-        output_map['links'] = links
-
-    # print unit test output
-    print json.dumps(output_map, indent=2, separators=(',', ': '))
+    content = extract_content(msg)
+    print content
     print
     return
+
 
 def run_tests():
     run_test('@chris you around?')
